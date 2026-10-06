@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Bookings · CFB Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <div id="nav"></div>
+
+    <div class="admin-main">
+      <header id="pageHeader" class="page-header" data-title="Booking Management"></header>
+
+      <div class="admin-body">
+        <div id="message" class="message" hidden></div>
+
+        <div class="card card-pad" style="margin-bottom:16px">
+          <div class="filters">
+            <div>
+              <label class="form-label" for="status">Status</label>
+              <select id="status">
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="room">Facility</label>
+              <select id="room"><option value="">All Facilities</option></select>
+            </div>
+            <div>
+              <label class="form-label" for="date">Date</label>
+              <input id="date" type="date">
+            </div>
+            <div>
+              <label class="form-label" for="searchUser">Search User</label>
+              <input id="searchUser" type="text" placeholder="Search name or email...">
+            </div>
+          </div>
+        </div>
+
+        <div class="card table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking</th><th>User</th><th>Facility</th><th>Date</th>
+                <th>Time Slot</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking details -->
+  <div class="modal" id="bookingModal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>Booking Details</h2>
+        <button type="button" onclick="closeModal('bookingModal')" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body" id="bookingDetail"></div>
+      <div class="modal-foot" id="bookingActions"></div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/admin-bookings.js"></script>
+</body>
+</html>

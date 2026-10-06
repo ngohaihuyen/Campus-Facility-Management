@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Log in · Campus Facility Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-box">
+      <div class="auth-head">
+        <span class="brand"><span class="brand-mark" id="brandMark"></span> Campus Facility Booking</span>
+        <h1 id="authTitle">Welcome Back</h1>
+        <p id="authSubtitle">Enter your university email to access your account</p>
+      </div>
+
+      <div id="message" class="message" hidden></div>
+
+      <!-- Log in -->
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Email Address / Student ID</label>
+          <input id="loginEmail" type="email" required autocomplete="username"
+                 placeholder="enter your email, e.g. anhnq2410071@usth.edu.vn">
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" required autocomplete="current-password"
+                 placeholder="enter your password">
+        </div>
+        <button class="btn btn-block" type="submit">Sign In</button>
+
+        <div class="auth-divider">or</div>
+        <button id="showRegister" class="btn btn-light btn-block" type="button">Create a student account</button>
+
+        <p class="form-switch">Teacher and staff accounts are created by the administrator.</p>
+      </form>
+
+      <!-- Register: students only -->
+      <form id="registerForm" hidden>
+        <div class="field">
+          <label for="registerName">Full name</label>
+          <input id="registerName" type="text" required placeholder="Nguyễn Quỳnh Anh">
+        </div>
+        <div class="field">
+          <label for="registerEmail">Student email</label>
+          <input id="registerEmail" type="email" required autocomplete="username"
+                 placeholder="anhnq2410071@usth.edu.vn">
+          <small class="hint">Name letters + your student code, e.g. <code>anhnq2410071@usth.edu.vn</code>.</small>
+        </div>
+        <div class="field">
+          <label for="registerPassword">Password</label>
+          <input id="registerPassword" type="password" required minlength="8"
+                 autocomplete="new-password" placeholder="At least 8 characters">
+        </div>
+        <button class="btn btn-block" type="submit">Create account</button>
+        <p class="form-switch">
+          Already have an account? <button id="showLogin" class="link" type="button">Sign in</button>
+        </p>
+      </form>
+
+      <div class="demo">
+        Sample accounts (password <code>Password@123</code>):<br>
+        <code>antt2410071@usth.edu.vn</code> · student<br>
+        <code>huydt@usth.edu.vn</code> · teacher<br>
+        <code>admin@usth.edu.vn</code> · admin
+      </div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

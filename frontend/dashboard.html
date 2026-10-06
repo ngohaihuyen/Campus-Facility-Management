@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Dashboard · Campus Facility Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="nav" class="nav"></header>
+
+  <main class="band">
+    <div class="container">
+      <h1 class="page-title" id="welcome">Welcome back!</h1>
+      <p class="page-sub" id="today"></p>
+
+      <div id="message" class="message" hidden></div>
+
+      <!-- the three numbers -->
+      <div class="stats">
+        <div class="card card-pad stat">
+          <div>
+            <div class="label">Upcoming Bookings</div>
+            <div class="value" id="upcomingCount">–</div>
+          </div>
+          <span class="pic pic-blue" id="icoUpcoming"></span>
+        </div>
+        <div class="card card-pad stat">
+          <div>
+            <div class="label">Total Bookings This Month</div>
+            <div class="value" id="monthCount">–</div>
+          </div>
+          <span class="pic pic-green" id="icoMonth"></span>
+        </div>
+        <div class="card card-pad stat">
+          <div>
+            <div class="label">Pending Approvals</div>
+            <div class="value" id="pendingCount">–</div>
+          </div>
+          <span class="pic pic-amber" id="icoPending"></span>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top: 22px;">
+        <div>
+          <h2 class="section-title">
+            My Upcoming Bookings
+            <a class="more" href="my-bookings.html" style="color:#fff">View all bookings</a>
+          </h2>
+          <div id="upcoming"></div>
+
+          <h2 class="section-title">Recent Activity</h2>
+          <div class="card card-pad" id="activity"></div>
+        </div>
+
+        <div>
+          <h2 class="section-title">Quick Book</h2>
+          <div class="card card-pad">
+            <div class="field">
+              <label for="quickSearch">Find a space</label>
+              <input id="quickSearch" type="text" placeholder="Enter facility name, building...">
+            </div>
+            <h3 style="margin-bottom:4px">Popular Facilities</h3>
+            <div id="popular"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

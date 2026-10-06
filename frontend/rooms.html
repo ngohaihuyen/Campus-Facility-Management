@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Facilities · Campus Facility Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="nav" class="nav"></header>
+
+  <main class="band">
+    <div class="container">
+      <div id="message" class="message" hidden></div>
+
+      <!-- filter card -->
+      <form class="card card-pad" id="filterForm">
+        <div class="field search-field">
+          <span id="searchIcon"></span>
+          <input id="search" type="text" placeholder="Search by name, location, equipment or keywords...">
+        </div>
+        <div class="filters">
+          <div>
+            <label class="form-label" for="category">Category</label>
+            <select id="category"><option value="">All Spaces</option></select>
+          </div>
+          <div>
+            <label class="form-label" for="capacity">Capacity</label>
+            <select id="capacity">
+              <option value="">Any Capacity</option>
+              <option value="5">5+ people</option>
+              <option value="10">10+ people</option>
+              <option value="20">20+ people</option>
+              <option value="50">50+ people</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Availability</label>
+            <label class="check"><input id="onlyOpen" type="checkbox" checked> Available today</label>
+          </div>
+          <div>
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-block" type="submit">Apply Filters</button>
+          </div>
+        </div>
+        <label class="check" style="margin-top:12px">
+          <input id="onlyMine" type="checkbox"> Only rooms my role can book
+        </label>
+      </form>
+
+      <div class="results-bar">
+        <span id="count">Loading…</span>
+        <span class="spacer"></span>
+      </div>
+
+      <div class="room-grid" id="rooms"></div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/rooms.js"></script>
+</body>
+</html>

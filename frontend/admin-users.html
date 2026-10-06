@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Users · CFB Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <div id="nav"></div>
+
+    <div class="admin-main">
+      <header id="pageHeader" class="page-header" data-title="User Management"
+              data-action='<button class="btn" type="button" onclick="openModal(&apos;userModal&apos;)">+ Add New User</button>'></header>
+
+      <div class="admin-body">
+        <div id="message" class="message" hidden></div>
+
+        <div class="card card-pad" style="margin-bottom:16px">
+          <div class="filters">
+            <div class="grow search-field">
+              <span id="searchIcon"></span>
+              <input id="search" type="text" placeholder="Search by name or email...">
+            </div>
+            <div>
+              <select id="roleFilter">
+                <option value="">All roles</option>
+                <option>STUDENT</option><option>TEACHER</option><option>STAFF</option><option>ADMIN</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>User</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add a user -->
+  <div class="modal" id="userModal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>Add New User</h2>
+        <button type="button" onclick="closeModal('userModal')" aria-label="Close">×</button>
+      </div>
+      <form id="userForm">
+        <div class="modal-body">
+          <div class="field">
+            <label for="newName">Full name</label>
+            <input id="newName" type="text" required placeholder="Nguyễn Quỳnh Anh">
+          </div>
+          <div class="field">
+            <label for="newEmail">University email</label>
+            <input id="newEmail" type="email" required placeholder="anhnq2410071@usth.edu.vn">
+            <small class="hint">Students can also register themselves. Teacher, staff and admin
+              accounts are created here.</small>
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="newPassword">Password (min 8 characters)</label>
+              <input id="newPassword" type="password" minlength="8" required autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label for="newRole">Role</label>
+              <select id="newRole">
+                <option>STUDENT</option><option>TEACHER</option><option>STAFF</option><option>ADMIN</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" type="button" onclick="closeModal('userModal')">Cancel</button>
+          <button class="btn" type="submit">Create account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/admin-users.js"></script>
+</body>
+</html>

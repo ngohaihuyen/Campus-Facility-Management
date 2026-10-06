@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>My Bookings · Campus Facility Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="nav" class="nav"></header>
+
+  <main class="band">
+    <div class="container">
+      <h1 class="page-title">My Bookings</h1>
+      <p class="page-sub">Every booking you have made, newest day first.</p>
+
+      <div id="message" class="message" hidden></div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" type="button" data-status="">All</button>
+        <button class="tab-btn" type="button" data-status="PENDING">Pending</button>
+        <button class="tab-btn" type="button" data-status="APPROVED">Approved</button>
+        <button class="tab-btn" type="button" data-status="REJECTED">Rejected</button>
+        <button class="tab-btn" type="button" data-status="CANCELLED">Cancelled</button>
+      </div>
+
+      <div class="card table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Facility</th><th>Date</th><th>Time Slot</th>
+              <th>Purpose</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/my-bookings.js"></script>
+</body>
+</html>

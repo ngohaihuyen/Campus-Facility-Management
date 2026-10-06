@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Facilities · CFB Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <div id="nav"></div>
+
+    <div class="admin-main">
+      <header id="pageHeader" class="page-header" data-title="Facilities Management"
+              data-action='<button class="btn" type="button" onclick="openAddForm()">+ Add New Facility</button>'></header>
+
+      <div class="admin-body">
+        <div id="message" class="message" hidden></div>
+
+        <div class="card card-pad" style="margin-bottom:16px">
+          <div class="filters">
+            <div class="grow search-field">
+              <span id="searchIcon"></span>
+              <input id="search" type="text" placeholder="Search facilities by name, location, keyword...">
+            </div>
+            <div>
+              <select id="categoryFilter"><option value="">All Categories</option></select>
+            </div>
+            <div>
+              <select id="statusFilter">
+                <option value="">Any Status</option>
+                <option value="AVAILABLE">Active</option>
+                <option value="UNAVAILABLE">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Facility Name</th><th>Category</th><th>Location</th>
+                <th>Capacity</th><th>Can book</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / edit facility -->
+  <div class="modal" id="roomModal" hidden>
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <h2 id="formTitle">Add New Facility</h2>
+        <button type="button" onclick="closeModal('roomModal')" aria-label="Close">×</button>
+      </div>
+      <form id="roomForm">
+        <div class="modal-body">
+          <input id="roomId" type="hidden">
+          <div class="field">
+            <label for="name">Facility Name</label>
+            <input id="name" type="text" required placeholder="ex: Physics Lab 1">
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="categoryId">Category</label>
+              <select id="categoryId" required></select>
+            </div>
+            <div class="field">
+              <label for="capacity">Capacity (1–300)</label>
+              <input id="capacity" type="number" min="1" max="300" placeholder="e.g. 50">
+            </div>
+          </div>
+          <div class="field">
+            <label for="location">Location</label>
+            <input id="location" type="text" placeholder="e.g. Building B, Floor 1">
+          </div>
+          <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" placeholder="Enter facility details, hours, instructions..."></textarea>
+          </div>
+          <div class="field">
+            <label for="equipment">Equipment</label>
+            <input id="equipment" type="text" placeholder="Projector, Whiteboard, AC, Wi-Fi, Podium">
+          </div>
+          <div class="field">
+            <label for="imageUrl">Facility image (link)</label>
+            <input id="imageUrl" type="text" placeholder="https://...">
+            <small class="hint">Paste a picture link. Leave it empty to show a plain box instead.</small>
+          </div>
+          <div class="field">
+            <label>Who can book this room</label>
+            <div class="actions">
+              <label class="check"><input class="roleBox" type="checkbox" value="STUDENT"> Student</label>
+              <label class="check"><input class="roleBox" type="checkbox" value="TEACHER"> Teacher</label>
+              <label class="check"><input class="roleBox" type="checkbox" value="STAFF"> Staff</label>
+            </div>
+            <small class="hint">Tick nothing = follow the room type. Tick only Teacher = teachers only.</small>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" type="button" onclick="closeModal('roomModal')">Cancel</button>
+          <button class="btn" id="saveButton" type="submit">Save Facility</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/admin-rooms.js"></script>
+</body>
+</html>

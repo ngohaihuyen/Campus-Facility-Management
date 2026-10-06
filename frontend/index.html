@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.svg">
+  <title>Facility Booking</title>
+  <script src="js/common.js"></script>
+</head>
+<body>
+  <script>
+    // Logged in -> go to the home page for this role. Not logged in -> login page.
+    const user = getUser();
+    window.location.href = getToken() && user ? homePage(user) : 'login.html';
+  </script>
+</body>
+</html>

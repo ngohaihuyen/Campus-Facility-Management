@@ -1,0 +1,615 @@
+<title>Facility Booking Backend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap">
+<style>
+:root{
+  --ground:#F4F6F8; --surface:#FFFFFF; --ink:#16202E; --muted:#556274; --line:#D9DFE6;
+  --accent:#0B6B72; --accent-soft:#E1F0F0; --code-bg:#101A26; --code-ink:#DCE6F0; --code-dim:#7F93A8;
+  --warn:#9A5B06; --warn-soft:#FBF0DD; --ok:#1F7A3E; --ok-soft:#E3F3E8; --bad:#A6312B; --bad-soft:#F8E6E4;
+  --kbd:#EEF1F4;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D131B; --surface:#141C26; --ink:#E2E8EF; --muted:#94A3B5; --line:#26313E;
+    --accent:#5CC4C0; --accent-soft:#12302F; --code-bg:#080D13; --code-ink:#D5E0EB; --code-dim:#6F8497;
+    --warn:#E3A857; --warn-soft:#2E2413; --ok:#6CCB8B; --ok-soft:#132A1C; --bad:#EE8A82; --bad-soft:#321715;
+    --kbd:#1F2935;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D131B; --surface:#141C26; --ink:#E2E8EF; --muted:#94A3B5; --line:#26313E;
+  --accent:#5CC4C0; --accent-soft:#12302F; --code-bg:#080D13; --code-ink:#D5E0EB; --code-dim:#6F8497;
+  --warn:#E3A857; --warn-soft:#2E2413; --ok:#6CCB8B; --ok-soft:#132A1C; --bad:#EE8A82; --bad-soft:#321715;
+  --kbd:#1F2935;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.62;padding-inline:16px;padding-block:0 64px}
+.shell{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow:auto;padding-block:32px}
+nav.toc .brand{font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:ph}
+nav.toc a{display:flex;gap:10px;padding:6px 10px;border-radius:6px;color:var(--muted);text-decoration:none;font-size:14px;line-height:1.35}
+nav.toc a span{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:1.5em;padding-top:1px}
+nav.toc a:hover,nav.toc a:focus-visible{background:var(--accent-soft);color:var(--ink);outline:none}
+main{min-width:0;padding-block:32px}
+header.top{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:8px}
+.eyebrow{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--cond);font-weight:700;font-size:clamp(34px,5vw,48px);line-height:1.05;margin:8px 0 14px;text-wrap:balance;letter-spacing:-.01em}
+.lede{font-size:18px;color:var(--muted);max-width:66ch;margin:0}
+.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-family:var(--mono);font-size:12.5px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink)}
+section.phase{padding-top:48px;scroll-margin-top:16px}
+.phase-head{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:18px}
+.phase-no{font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:500}
+h2{font-family:var(--cond);font-weight:700;font-size:30px;line-height:1.15;margin:0;text-wrap:balance}
+h3{font-family:var(--cond);font-weight:600;font-size:21px;margin:34px 0 8px;text-wrap:balance}
+h3 .step{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500;margin-right:8px}
+p,li{max-width:70ch}
+p{margin:0 0 12px}
+ul,ol{padding-left:22px;margin:0 0 14px}
+li{margin:4px 0}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em;background:var(--kbd);padding:1px 5px;border-radius:4px}
+kbd{font-family:var(--mono);font-size:.82em;background:var(--kbd);border:1px solid var(--line);border-bottom-width:2px;padding:1px 6px;border-radius:4px}
+.path{font-family:var(--mono);font-size:.9em;color:var(--ink);background:var(--accent-soft);padding:1px 6px;border-radius:4px}
+.ui{font-weight:600}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0;max-width:74ch}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.note b:first-child{display:block;font-family:var(--cond);letter-spacing:.04em;text-transform:uppercase;font-size:13px;margin-bottom:2px}
+.note p:last-child{margin-bottom:0}
+.code{position:relative;margin:12px 0 18px;border-radius:8px;background:var(--code-bg);color:var(--code-ink)}
+.code .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-family:var(--mono);font-size:12px;color:var(--code-dim)}
+.code pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.55;tab-size:2}
+.copy{font:inherit;color:var(--code-ink);background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:2px 9px;cursor:pointer}
+.copy:hover,.copy:focus-visible{border-color:var(--accent);outline:none}
+details.file{margin:12px 0 18px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+details.file>summary{cursor:pointer;padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;list-style:none}
+details.file>summary::-webkit-details-marker{display:none}
+details.file>summary::before{content:"▸";color:var(--accent);transition:transform .15s}
+details.file[open]>summary::before{transform:rotate(90deg)}
+details.file>summary .fn{font-family:var(--mono);font-size:14px;font-weight:500}
+details.file>summary .what{color:var(--muted);font-size:14px}
+details.file .code{margin:0;border-radius:0 0 7px 7px}
+.tbl{overflow-x:auto;margin:12px 0 20px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground)}
+tr:last-child td{border-bottom:0}
+td code{white-space:nowrap}
+.m{font-family:var(--mono);font-size:12px;font-weight:500;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.GET{background:var(--ok-soft);color:var(--ok)} .POST{background:var(--accent-soft);color:var(--accent)}
+.PUT,.PATCH{background:var(--warn-soft);color:var(--warn)} .DELETE{background:var(--bad-soft);color:var(--bad)}
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}
+.flow div{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px}
+.flow b{font-family:var(--cond);font-size:17px;display:block}
+.flow small{color:var(--muted);font-size:13.5px;line-height:1.45;display:block;margin-top:2px}
+.flow .db{border-color:var(--accent)}
+.status{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 18px;font-family:var(--mono);font-size:13px}
+.status span{padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.status .arrow{border:0;background:none;padding:0;color:var(--muted)}
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;margin:12px 0 20px}
+.checklist{list-style:none;padding:0}
+.checklist li{padding-left:28px;position:relative}
+.checklist li::before{content:"";position:absolute;left:2px;top:.45em;width:14px;height:14px;border:1.5px solid var(--accent);border-radius:3px}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;max-height:none;padding-block:24px 0}
+  nav.toc ol{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .flow{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell">
+<nav class="toc" aria-label="Contents">
+  <div class="brand">Backend guide</div>
+  <ol>
+    <li><a href="#p0"><span>0</span>What you will build</a></li>
+    <li><a href="#p1"><span>1</span>Install the tools</a></li>
+    <li><a href="#p2"><span>2</span>Build the database</a></li>
+    <li><a href="#p3"><span>3</span>Create the project</a></li>
+    <li><a href="#p4"><span>4</span>Write the code</a></li>
+    <li><a href="#pf"><span>5</span>Build the frontend</a></li>
+    <li><a href="#p5"><span>6</span>Run and test</a></li>
+    <li><a href="#p6"><span>7</span>API reference</a></li>
+    <li><a href="#p7"><span>8</span>Rules to change</a></li>
+    <li><a href="#p8"><span>9</span>Troubleshooting</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">University Facility Booking System</div>
+  <h1>Building the full app with MySQL, Node.js and plain HTML</h1>
+  <p class="lede">A basic, student-friendly booking system built on the team's own database schema, workflow diagram and meeting decisions: 3 SQL files, a 7-file Express API, and 9 plain HTML pages served by that API.</p>
+  <div class="stack">
+    <span class="chip">HTML · CSS · JS</span><span class="chip">MySQL 8</span><span class="chip">MySQL Workbench</span><span class="chip">Node.js 22 LTS</span><span class="chip">Express 5</span><span class="chip">mysql2</span><span class="chip">JWT + bcrypt</span>
+  </div>
+</header>
+
+<!-- ============================ PHASE 0 ============================ -->
+<section class="phase" id="p0">
+  <div class="phase-head"><span class="phase-no">Phase 0</span><h2>What you will build</h2></div>
+  <div class="flow">
+    <div><b>Frontend</b><small>HTML, CSS, JavaScript. Calls the API with <code>fetch()</code> and sends the login token.</small></div>
+    <div><b>Express API</b><small>Checks the login and role, applies the booking rules, then reads or writes MySQL.</small></div>
+    <div class="db"><b>MySQL</b><small>Stores users, room types, rooms and bookings.</small></div>
+  </div>
+
+  <h3>The workflow the code follows</h3>
+  <p>This is the team's swimlane diagram (User, System, Admin), turned into API calls.</p>
+  <pre class="mermaid">
+flowchart TD
+  A[Register as student / Log in] --> B{University email?}
+  B -- No --> X[Show error]
+  B -- Yes --> C{Role?}
+  C -- ADMIN --> AD[Admin home]
+  C -- STUDENT / TEACHER / STAFF --> U1[View rooms, search, filter]
+  U1 --> U2[Room details]
+  U2 --> U3[Choose date + one 30-minute slot]
+  U3 --> D{Time conflict?}
+  D -- Yes --> U3
+  D -- No --> U4[Enter purpose - required]
+  U4 --> U5[Send request: status PENDING]
+  U5 --> R[Admin checks user, room, date, time, purpose]
+  AD --> R
+  R --> E{Approve?}
+  E -- Yes --> OK[APPROVED]
+  E -- No --> NO[REJECTED]
+  E -- No action --> P[stays PENDING]
+  </pre>
+
+  <h3>Booking statuses</h3>
+  <div class="status"><span>PENDING</span><span class="arrow">→</span><span>APPROVED</span><span class="arrow" style="margin-left:18px">·</span><span>PENDING</span><span class="arrow">→</span><span>REJECTED</span></div>
+  <div class="status"><span>PENDING / APPROVED</span><span class="arrow">→</span><span>CANCELLED</span></div>
+  <p><b>CANCELLED</b> was added for three cases: the user cancels, a teacher takes the slot, or the admin closes the room.</p>
+
+  <h3>Database: the team's 4 tables</h3>
+  <pre class="mermaid">
+erDiagram
+  users ||--o{ bookings : makes
+  facilities ||--o{ bookings : "booked in"
+  facility_categories ||--o{ facilities : groups
+  users { int id PK
+          string name
+          string email UK
+          string password
+          enum role
+          bool is_active }
+  facility_categories { int id PK
+          string name UK
+          string description
+          set allowed_roles }
+  facilities { int id PK
+          int category_id FK
+          string name
+          string location
+          int capacity
+          set allowed_roles
+          enum status }
+  bookings { int id PK
+          int user_id FK
+          int facility_id FK
+          date booking_date
+          time start_time
+          time end_time
+          string purpose
+          enum status
+          string admin_note
+          datetime created_at }
+  </pre>
+  <p>This is your <code>01_create_database.sql</code>. A few small additions support the meeting decisions, each marked <code>-- added</code> in the file:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Addition</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>users.is_active</code></td><td>Admin can lock an account</td></tr>
+      <tr><td><code>facility_categories.allowed_roles</code></td><td>Role decides which room types a user may book (minute 2.12)</td></tr>
+      <tr><td><code>facilities.allowed_roles</code></td><td>A rule for ONE room (e.g. Chemistry Lab D101 → teachers only). Empty = follow the room type</td></tr>
+      <tr><td><code>facilities.image_url</code></td><td>The photo shown on a room card (the design has pictures)</td></tr>
+      <tr><td><code>CHECK (capacity &gt; 0 AND capacity &lt;= 300)</code></td><td>Capacity is a whole number from 1 to 300 — never negative</td></tr>
+      <tr><td>facility status <code>HIDDEN</code></td><td>“Delete” hides a room but keeps its old bookings</td></tr>
+      <tr><td>booking status <code>CANCELLED</code> + <code>admin_note</code></td><td>Cancel a booking and store the reason for a rejection or cancellation</td></tr>
+      <tr><td><code>CHECK (end_time &gt; start_time)</code>, an index, <code>DROP TABLE IF EXISTS</code></td><td>Safety, speed, and a script that can be run again</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Folder layout</h3>
+  <div class="code"><div class="bar"><span>facility-booking/</span></div><pre>facility-booking/
+├── README.md                 English guide
+├── HUONG_DAN_CHAY.md         Vietnamese run guide
+├── frontend/                 the website (11 pages, Figma design)
+│   ├── login.html  dashboard.html  rooms.html  room.html
+│   ├── my-bookings.html  account.html  index.html
+│   ├── admin-dashboard.html  admin-bookings.html
+│   ├── admin-rooms.html  admin-users.html  admin-settings.html
+│   ├── css/style.css   img/room-placeholder.svg
+│   └── js/common.js + one script per page
+├── database/
+│   ├── 01_create_database.sql
+│   ├── 02_seed_data.sql
+│   └── 03_useful_queries.sql
+└── backend/
+    ├── .env.example
+    ├── package.json
+    ├── api-tests.http
+    ├── scripts/race-test.js
+    └── src/
+        ├── server.js         start here (API + serves frontend/)
+        ├── db.js             query() and transaction()
+        ├── slots.js          the 28 time slots of a day
+        ├── rules.js          booking rules in one place
+        ├── middleware.js     requireLogin, requireRole, errorHandler
+        └── routes/
+            ├── auth.js
+            ├── facilities.js
+            ├── bookings.js   ← all booking rules
+            └── admin.js</pre></div>
+</section>
+
+<!-- ============================ PHASE 1 ============================ -->
+<section class="phase" id="p1">
+  <div class="phase-head"><span class="phase-no">Phase 1</span><h2>Install the tools</h2></div>
+  <ol>
+    <li><b>MySQL Server 8</b> (Community, 8.0.16 or newer). During setup, keep port <code>3306</code>, set a <b>root password</b> and write it down.</li>
+    <li><b>MySQL Workbench</b>, to run SQL files and look at your data.</li>
+    <li><b>Node.js 22 LTS</b> (18 or newer works).</li>
+    <li><b>VS Code</b> with the <b>REST Client</b> extension. Postman also works.</li>
+  </ol>
+  <div class="code"><div class="bar"><span>terminal</span><button class="copy" type="button">Copy</button></div><pre>node -v     # v18 or higher</pre></div>
+</section>
+
+<!-- ============================ PHASE 2 ============================ -->
+<section class="phase" id="p2">
+  <div class="phase-head"><span class="phase-no">Phase 2</span><h2>Build the database in Workbench</h2></div>
+  <ol>
+    <li>Open MySQL Workbench, click <span class="ui">Local instance MySQL80</span> and enter the root password.</li>
+    <li>For each file: <span class="ui">File → Open SQL Script</span>, then click the <b>lightning bolt</b> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd>). Every line in <span class="ui">Action Output</span> should show a green tick.</li>
+  </ol>
+
+  <h3><span class="step">2.1</span>Database and tables</h3>
+  <div class="note warn"><b>Careful</b><p>Running this file again deletes all tables and data. Run 02 after it.</p></div>
+  {{FILE:database/01_create_database.sql|01_create_database.sql|Database + 4 tables}}
+
+  <h3><span class="step">2.2</span>Sample data</h3>
+  <p>Adds 5 accounts (all with password <code>Password@123</code>), 6 room types and 7 rooms. Emails follow the university format <code>anhnq2410071@usth.edu.vn</code>. The Teacher Meeting Room can only be booked by teachers, Chemistry Lab D101 has its own teachers-only rule, Computer Room E201 is for teachers and staff, and the Badminton Hall starts as UNAVAILABLE.</p>
+  {{FILE:database/02_seed_data.sql|02_seed_data.sql|Users, room types, rooms}}
+
+  <h3><span class="step">2.3</span>Queries for checking your data</h3>
+  <p>Don't run this whole file. Put the cursor inside one query and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. The “overlapping bookings” query must always return no rows.</p>
+  {{FILE:database/03_useful_queries.sql|03_useful_queries.sql|Check your data}}
+</section>
+
+<!-- ============================ PHASE 3 ============================ -->
+<section class="phase" id="p3">
+  <div class="phase-head"><span class="phase-no">Phase 3</span><h2>Create the Node.js project</h2></div>
+  <div class="code"><div class="bar"><span>terminal, inside facility-booking/</span><button class="copy" type="button">Copy</button></div><pre>mkdir backend
+cd backend
+npm init -y
+npm install express mysql2 bcryptjs jsonwebtoken dotenv cors
+npm install -D nodemon</pre></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Package</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>express</code></td><td>Web server and routes</td></tr>
+      <tr><td><code>mysql2</code></td><td>Talks to MySQL</td></tr>
+      <tr><td><code>bcryptjs</code></td><td>Hashes passwords (never store the real password)</td></tr>
+      <tr><td><code>jsonwebtoken</code></td><td>Login tokens</td></tr>
+      <tr><td><code>dotenv</code></td><td>Reads settings from <code>.env</code></td></tr>
+      <tr><td><code>cors</code></td><td>Lets the frontend call the API</td></tr>
+      <tr><td><code>nodemon</code></td><td>Restarts the server when you save a file</td></tr>
+    </tbody>
+  </table></div>
+  {{FILE:backend/package.json|package.json|Scripts and packages}}
+  <p>Copy <span class="path">.env.example</span> to <span class="path">.env</span>, then set <code>DB_PASSWORD</code> to your MySQL root password and <code>JWT_SECRET</code> to any long random text. Never commit <code>.env</code> to Git.</p>
+  {{FILE:backend/.env.example|.env.example|Settings}}
+</section>
+
+<!-- ============================ PHASE 4 ============================ -->
+<section class="phase" id="p4">
+  <div class="phase-head"><span class="phase-no">Phase 4</span><h2>Write the code</h2></div>
+  <p>Write the files in this order. Click a file name to see its code.</p>
+
+  <h3><span class="step">4.1</span>db.js: talking to MySQL</h3>
+  <p>Every other file uses just two helpers:</p>
+  <div class="code"><div class="bar"><span>how to use them</span><button class="copy" type="button">Copy</button></div><pre>// SELECT -> array of rows
+const rooms = await query('SELECT * FROM facilities WHERE id = :id', { id: 5 });
+
+// INSERT / UPDATE -> { insertId, affectedRows }
+const result = await query('UPDATE users SET is_active = 0 WHERE id = :id', { id: 5 });
+if (result.affectedRows === 0) { /* nothing was changed */ }
+
+// several statements: all saved together, or none
+await transaction(async (q) => {
+  await q('...');
+  await q('...');
+});</pre></div>
+  <div class="note warn"><b>Always use :parameters</b><p>Never write <code>`... WHERE email = '${email}'`</code>. Putting user text directly into SQL makes SQL injection possible.</p></div>
+  {{FILE:backend/src/db.js|src/db.js|Connection pool, query(), transaction()}}
+
+  <h3><span class="step">4.2</span>middleware.js: login, role, errors</h3>
+  <ul>
+    <li><code>requireLogin</code> checks the token and puts the user into <code>req.user</code>.</li>
+    <li><code>requireRole('ADMIN')</code> lets only the listed roles through.</li>
+    <li><code>httpError(404, '...')</code> creates an error that already has its HTTP status.</li>
+    <li><code>errorHandler</code> turns every error into <code>{ "message": "..." }</code>.</li>
+  </ul>
+  {{FILE:backend/src/middleware.js|src/middleware.js|requireLogin, requireRole, errorHandler}}
+
+  <h3><span class="step">4.3</span>routes/auth.js: “Is it a university account?”</h3>
+  <p><b>Students register themselves</b>; teacher, staff and admin accounts are created by the admin (<code>POST /api/admin/users</code>). Registering needs the student code, logging in does not:</p>
+  <div class="code"><div class="bar"><span>the email rule</span><button class="copy" type="button">Copy</button></div><pre>// LOGIN: letters, an optional student code, then the university domain
+// anhnq2410071@usth.edu.vn  ✔      huydt@usth.edu.vn  ✔      someone@gmail.com  ✘
+new RegExp(`^[a-z]{2,}[0-9]*@${domain}$`)
+
+// REGISTER: the student code is required, so only students can sign up
+// anhnq2410071@usth.edu.vn  ✔      huydt@usth.edu.vn  ✘ (no code)
+new RegExp(`^[a-z]{2,}[0-9]{4,}@${domain}$`)   // domain = EMAIL_DOMAIN in .env</pre></div>
+  {{FILE:backend/src/routes/auth.js|src/routes/auth.js|Register, login, me, change password}}
+
+  <h3><span class="step">4.3b</span>slots.js and rules.js: the times and the rules</h3>
+  <p>A day is cut into <b>28 slots of 30 minutes</b>: <code>07:01–07:30</code>, <code>07:31–08:00</code>, … <code>20:31–21:00</code>. One booking is exactly one slot, so two bookings can never overlap by accident, and the user picks a slot from a list instead of typing a time.</p>
+  {{FILE:backend/src/slots.js|src/slots.js|The 28 time slots of a day}}
+  {{FILE:backend/src/rules.js|src/rules.js|Days ahead, purpose length, teacher priority}}
+
+  <h3><span class="step">4.4</span>routes/facilities.js: view, search, filter, details</h3>
+  <p>The <code>(:search IS NULL OR ...)</code> pattern means “skip this filter if it wasn't sent”. <code>COALESCE(f.allowed_roles, c.allowed_roles)</code> takes the rule of the room, or the rule of its room type when the room has none; <code>can_book</code> then tells the frontend whether the logged-in user may book it. The availability endpoint returns all 28 slots with their status (Free / Waiting for approval / Booked / Closed) plus <code>canTakeOver</code>, which is true when a teacher may take a slot a student booked.</p>
+  {{FILE:backend/src/routes/facilities.js|src/routes/facilities.js|Categories, list, details, availability}}
+
+  <h3><span class="step">4.5</span>routes/bookings.js: the core</h3>
+  <p><code>checkBookingInput()</code> first checks everything that doesn't need the database: the date, that the time is a real slot, and the purpose. Then one transaction runs six steps:</p>
+  <ol>
+    <li>Lock the room with <code>SELECT ... FOR UPDATE</code>.</li>
+    <li>Check that the user's role may book this room (room rule first, then room type).</li>
+    <li>Find overlapping bookings.</li>
+    <li>Apply the teacher priority rule, or refuse and show the taken time.</li>
+    <li>Save the new booking as PENDING.</li>
+    <li>Cancel any student bookings that were replaced.</li>
+  </ol>
+  <div class="code"><div class="bar"><span>the overlap check</span><button class="copy" type="button">Copy</button></div><pre>WHERE b.facility_id  = :facilityId
+  AND b.booking_date = :bookingDate
+  AND b.status IN ('PENDING', 'APPROVED')
+  AND b.start_time &lt; :endTime     -- other booking starts before mine ends
+  AND b.end_time   &gt; :startTime   -- and ends after mine starts
+-- 10:01-10:30 vs 10:31-11:00:  10:31 &lt; 10:30 is false  →  no overlap (allowed)</pre></div>
+  <p><b>Why the lock?</b> Without it, two students clicking “Book” in the same second could both pass the overlap check and both be saved. <code>FOR UPDATE</code> makes the second request wait until the first one is done. Storing the time to the second doesn't prevent this; only the lock does. We tested it: 10 requests at once, and exactly 1 was saved.</p>
+  {{FILE:backend/src/routes/bookings.js|src/routes/bookings.js|Rules, create, my bookings, cancel}}
+
+  <h3><span class="step">4.6</span>routes/admin.js</h3>
+  <p>Admins review bookings (only PENDING ones), manage rooms and manage users. When a room is closed or deleted, its future bookings are cancelled automatically. Because there is no registration page, <code>POST /admin/users</code> is where accounts are created; after that the admin only changes the role or locks the account. A room's capacity is checked here too: a whole number from 1 to 300.</p>
+  {{FILE:backend/src/routes/admin.js|src/routes/admin.js|Review bookings, rooms, users}}
+
+  <h3><span class="step">4.7</span>server.js</h3>
+  {{FILE:backend/src/server.js|src/server.js|Start here}}
+</section>
+
+<!-- ============================ PHASE F ============================ -->
+<section class="phase" id="pf">
+  <div class="phase-head"><span class="phase-no">Phase 5</span><h2>Build the frontend</h2></div>
+  <p>The website is plain HTML, CSS and JavaScript in the <span class="path">frontend/</span> folder. <code>server.js</code> serves this folder, so <code>npm run dev</code> starts the whole system at <code>http://localhost:3000</code>. You don't need Live Server, and there are no CORS problems.</p>
+  <div class="code"><div class="bar"><span>server.js</span><button class="copy" type="button">Copy</button></div><pre>app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));</pre></div>
+
+  <h3>One page per screen of the workflow</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Page</th><th>Who</th><th>Workflow step</th><th>API calls</th></tr></thead>
+    <tbody>
+      <tr><td><code>login.html</code></td><td>Everyone</td><td>Log in, and register a student account</td><td><code>POST /auth/login</code>, <code>POST /auth/register</code></td></tr>
+      <tr><td><code>dashboard.html</code></td><td>User</td><td>My numbers, next bookings, popular rooms, recent activity</td><td><code>GET /bookings/summary</code></td></tr>
+      <tr><td><code>rooms.html</code></td><td>User</td><td>View rooms, search, filter by type</td><td><code>GET /facilities</code>, <code>/facilities/categories</code></td></tr>
+      <tr><td><code>room.html</code></td><td>User</td><td>Room details → pick a date → choose a free slot → enter purpose → send request</td><td><code>GET /facilities/:id</code>, <code>/availability</code>, <code>POST /bookings</code></td></tr>
+      <tr><td><code>my-bookings.html</code></td><td>User</td><td>Booking history, cancel</td><td><code>GET /bookings/my</code>, <code>PATCH /bookings/:id/cancel</code></td></tr>
+      <tr><td><code>account.html</code></td><td>Everyone</td><td>Profile, change password</td><td><code>GET /auth/me</code>, <code>PUT /auth/password</code></td></tr>
+      <tr><td><code>admin-bookings.html</code></td><td>Admin</td><td>View request → check → approve / reject; history of all users</td><td><code>GET /admin/bookings</code>, <code>PATCH /admin/bookings/:id</code></td></tr>
+      <tr><td><code>admin-dashboard.html</code></td><td>Admin</td><td>Numbers, recent bookings, approval queue</td><td><code>GET /admin/summary</code></td></tr>
+      <tr><td><code>admin-rooms.html</code></td><td>Admin</td><td>Add, edit, delete/hide, change status, who may book, capacity 1–300</td><td><code>/admin/facilities</code></td></tr>
+      <tr><td><code>admin-users.html</code></td><td>Admin</td><td>Create an account, change role, lock account</td><td><code>/admin/users</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="step">5.1</span>common.js: shared by every page</h3>
+  <ul>
+    <li><code>api(method, url, body)</code> calls the backend and adds the login token automatically. If the token has expired, it sends the user back to the login page.</li>
+    <li><code>requireLogin('ADMIN')</code> protects a page and draws the navigation bar for the user's role.</li>
+    <li><code>esc(text)</code> must wrap every value from the database before it goes into <code>innerHTML</code>. It stops users from injecting HTML or scripts.</li>
+  </ul>
+  {{FILE:frontend/js/common.js|js/common.js|api(), login state, nav bar, helpers}}
+
+  <h3><span class="step">5.2</span>Every page follows the same pattern</h3>
+  <div class="code"><div class="bar"><span>page pattern</span><button class="copy" type="button">Copy</button></div><pre>&lt;header id="nav" class="nav"&gt;&lt;/header&gt;     &lt;!-- common.js fills this in --&gt;
+&lt;main class="container"&gt; ... &lt;/main&gt;
+&lt;script src="js/common.js"&gt;&lt;/script&gt;
+&lt;script src="js/rooms.js"&gt;&lt;/script&gt;
+
+// rooms.js
+const user = requireLogin('STUDENT', 'TEACHER', 'STAFF');   // 1. protect the page
+async function loadRooms() {                                // 2. load data
+  const rooms = await api('GET', '/facilities');
+  box.innerHTML = rooms.map((r) =&gt; `... ${esc(r.name)} ...`).join('');  // 3. draw it
+}
+if (user) loadRooms();</pre></div>
+  {{FILE:frontend/login.html|login.html|Log in + register form}}
+  {{FILE:frontend/js/login.js|js/login.js|Log in, register}}
+  {{FILE:frontend/dashboard.html|dashboard.html|User dashboard}}
+  {{FILE:frontend/js/dashboard.js|js/dashboard.js|Numbers, next bookings, quick book}}
+  {{FILE:frontend/rooms.html|rooms.html|Room list page}}
+  {{FILE:frontend/js/rooms.js|js/rooms.js|Search and filter}}
+
+  <h3><span class="step">5.3</span>The booking page</h3>
+  <p>A day timeline shows taken slots (orange = waiting for approval, red = booked), and the dropdown lists all 28 slots. A slot that is already taken is greyed out, so the user cannot even choose it — except for a teacher, who sees “you can take it” on a slot a student booked. The backend still checks everything again.</p>
+  {{FILE:frontend/room.html|room.html|Details, availability, booking form}}
+  {{FILE:frontend/js/room.js|js/room.js|Timeline, free times, send request}}
+
+  <h3><span class="step">5.4</span>User history and account</h3>
+  {{FILE:frontend/my-bookings.html|my-bookings.html|Booking history}}
+  {{FILE:frontend/js/my-bookings.js|js/my-bookings.js|Status tabs, cancel}}
+  {{FILE:frontend/account.html|account.html|Profile + password}}
+  {{FILE:frontend/js/account.js|js/account.js|Change password}}
+
+  <h3><span class="step">5.5</span>Admin pages</h3>
+  {{FILE:frontend/admin-dashboard.html|admin-dashboard.html|Admin dashboard}}
+  {{FILE:frontend/js/admin-dashboard.js|js/admin-dashboard.js|Numbers, recent bookings, queue}}
+  {{FILE:frontend/admin-bookings.html|admin-bookings.html|Review requests}}
+  {{FILE:frontend/js/admin-bookings.js|js/admin-bookings.js|Approve / reject, filters}}
+  {{FILE:frontend/admin-rooms.html|admin-rooms.html|Room management}}
+  {{FILE:frontend/js/admin-rooms.js|js/admin-rooms.js|Add, edit, open/close, remove}}
+  {{FILE:frontend/admin-users.html|admin-users.html|User management}}
+  {{FILE:frontend/js/admin-users.js|js/admin-users.js|Create account, role change, lock}}
+
+  <h3><span class="step">5.6</span>Styles</h3>
+  {{FILE:frontend/css/style.css|css/style.css|One stylesheet for all pages}}
+  {{FILE:frontend/index.html|index.html|Redirect to login or home}}
+</section>
+
+<!-- ============================ PHASE 5 ============================ -->
+<section class="phase" id="p5">
+  <div class="phase-head"><span class="phase-no">Phase 6</span><h2>Run and test</h2></div>
+  <div class="code"><div class="bar"><span>terminal, inside backend/</span><button class="copy" type="button">Copy</button></div><pre>npm run dev</pre></div>
+  <div class="code"><div class="bar"><span>expected</span></div><pre>Connected to MySQL
+Website:  http://localhost:3000
+API:      http://localhost:3000/api</pre></div>
+  <p><b>Use the website:</b> open <code>http://localhost:3000</code> and log in with one of the accounts below.</p>
+  <p><b>Or test the API directly:</b> open <span class="path">api-tests.http</span>, change <code>@day</code> to a date 2 to 30 days from today, and click <span class="ui">Send Request</span> on each block from top to bottom.</p>
+  {{FILE:backend/api-tests.http|api-tests.http|Ready-made test requests}}
+  <div class="tbl"><table>
+    <thead><tr><th>Account</th><th>Password</th></tr></thead>
+    <tbody>
+      <tr><td><code>admin@usth.edu.vn</code> (ADMIN)</td><td rowspan="5"><code>Password@123</code></td></tr>
+      <tr><td><code>huydt@usth.edu.vn</code> (TEACHER)</td></tr>
+      <tr><td><code>hapt@usth.edu.vn</code> (STAFF)</td></tr>
+      <tr><td><code>antt2410071@usth.edu.vn</code> (STUDENT)</td></tr>
+      <tr><td><code>binhlm2410072@usth.edu.vn</code> (STUDENT)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Prove there is no double booking</h3>
+  {{FILE:backend/scripts/race-test.js|scripts/race-test.js|10 requests at the same moment}}
+  <div class="code"><div class="bar"><span>second terminal, server still running</span><button class="copy" type="button">Copy</button></div><pre>npm run test:race
+# Status codes: 201 409 409 409 409 409 409 409 409 409
+# PASS: only one booking was saved</pre></div>
+
+  <h3>Acceptance checklist</h3>
+  <ul class="checklist">
+    <li>Registering with <code>anhnq2410099@usth.edu.vn</code> → 201, role STUDENT</li>
+    <li>Registering with <code>huydt@usth.edu.vn</code> (no student code) → 400</li>
+    <li>Logging in with a Gmail address → 400 “Use your university email…”</li>
+    <li>A time that is not a slot (10:00–12:00) → 400 “Choose one time slot…”</li>
+    <li>Booking a taken slot → 409 with the taken time; the next slot → 201</li>
+    <li>Booking with no purpose → 400</li>
+    <li>Student books the Teacher Meeting Room (room type rule) → 403</li>
+    <li>Student books Chemistry Lab D101 (rule for that one room) → 403</li>
+    <li>Adding a room with capacity 400 or −5 → 400</li>
+    <li>Admin creates an account with a Gmail address → 400; with a university email → 201</li>
+    <li>Teacher books over a student more than 24h ahead → 201; the student's booking becomes CANCELLED with a note</li>
+    <li>Rejecting without a note → 400; reviewing the same booking twice → 409</li>
+    <li>Room set to UNAVAILABLE → its future bookings become CANCELLED</li>
+    <li>Locked user → 403</li>
+    <li>Race test → exactly one 201</li>
+  </ul>
+</section>
+
+<!-- ============================ PHASE 6 ============================ -->
+<section class="phase" id="p6">
+  <div class="phase-head"><span class="phase-no">Phase 7</span><h2>API reference</h2></div>
+  <p>Send <code>Authorization: Bearer &lt;token&gt;</code> with every request except login. Errors look like <code>{ "message": "..." }</code>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Method</th><th>URL</th><th>Who</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/auth/register</code></td><td>Anyone</td><td>Register a STUDENT (student-code email)</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/auth/login</code></td><td>Anyone</td><td>Get a token (university email only)</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/auth/me</code></td><td>Logged in</td><td>My account</td></tr>
+      <tr><td><span class="m PUT">PUT</span></td><td><code>/api/auth/password</code></td><td>Logged in</td><td>Change password</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/facilities/categories</code></td><td>Logged in</td><td>Room types + allowed roles</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/facilities?search=&amp;categoryId=</code></td><td>Logged in</td><td>List, search, filter</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/facilities/:id</code></td><td>Logged in</td><td>Room details</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/facilities/:id/availability?date=</code></td><td>Logged in</td><td>The 28 slots of a day + status</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/bookings</code></td><td>Student, Teacher, Staff</td><td>Send a booking request</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/bookings/summary</code></td><td>Logged in</td><td>Numbers for my dashboard</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/bookings/my?status=</code></td><td>Logged in</td><td>My booking history</td></tr>
+      <tr><td><span class="m PATCH">PATCH</span></td><td><code>/api/bookings/:id/cancel</code></td><td>Owner</td><td>Cancel</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/admin/summary</code></td><td>Admin</td><td>Numbers for the admin dashboard</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/admin/bookings?status=&amp;facilityId=&amp;date=</code></td><td>Admin</td><td>All bookings</td></tr>
+      <tr><td><span class="m PATCH">PATCH</span></td><td><code>/api/admin/bookings/:id</code></td><td>Admin</td><td>Approve / reject</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/admin/facilities</code></td><td>Admin</td><td>Add room</td></tr>
+      <tr><td><span class="m PUT">PUT</span></td><td><code>/api/admin/facilities/:id</code></td><td>Admin</td><td>Edit room</td></tr>
+      <tr><td><span class="m PATCH">PATCH</span></td><td><code>/api/admin/facilities/:id/status</code></td><td>Admin</td><td>AVAILABLE / UNAVAILABLE</td></tr>
+      <tr><td><span class="m DELETE">DELETE</span></td><td><code>/api/admin/facilities/:id</code></td><td>Admin</td><td>Hide room</td></tr>
+      <tr><td><span class="m POST">POST</span></td><td><code>/api/admin/users</code></td><td>Admin</td><td>Create an account</td></tr>
+      <tr><td><span class="m GET">GET</span></td><td><code>/api/admin/users?search=&amp;role=</code></td><td>Admin</td><td>List users</td></tr>
+      <tr><td><span class="m PATCH">PATCH</span></td><td><code>/api/admin/users/:id</code></td><td>Admin</td><td>Change role / lock</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Status codes:</b> 200 OK · 201 created · 400 bad input · 401 not logged in · 403 not allowed · 404 not found · 409 time taken / room unavailable / already reviewed · 500 server error.</p>
+</section>
+
+<!-- ============================ PHASE 7 ============================ -->
+<section class="phase" id="p7">
+  <div class="phase-head"><span class="phase-no">Phase 8</span><h2>Rules you can change</h2></div>
+  <p>The times are in <span class="path">src/slots.js</span>, the rest in <span class="path">src/rules.js</span>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Rule</th><th>Default</th><th>Setting</th></tr></thead>
+    <tbody>
+      <tr><td>Opening hours</td><td>07:00 – 21:00</td><td><code>OPEN_HOUR</code>, <code>CLOSE_HOUR</code> in <code>slots.js</code></td></tr>
+      <tr><td>Slot length</td><td>30 minutes → 28 slots a day</td><td><code>SLOT_MINUTES</code> in <code>slots.js</code></td></tr>
+      <tr><td>Book ahead</td><td>up to 30 days</td><td><code>maxDaysAhead</code></td></tr>
+      <tr><td>Purpose</td><td>at least 10 characters</td><td><code>minPurposeLength</code></td></tr>
+      <tr><td>Teacher can take a student's slot</td><td>only if it starts more than 24h from now</td><td><code>replaceAfterHours</code>, <code>PRIORITY</code></td></tr>
+      <tr><td>Who may book a room type</td><td>Teacher Meeting Room: teachers; Laboratory: students and teachers</td><td><code>allowed_roles</code> in <code>facility_categories</code></td></tr>
+      <tr><td>Who may book ONE room</td><td>Chemistry Lab D101: teachers; Computer Room E201: teachers and staff</td><td><code>allowed_roles</code> in <code>facilities</code> (tick boxes on the admin Rooms page)</td></tr>
+      <tr><td>Room capacity</td><td>1 – 300 people</td><td><code>MAX_CAPACITY</code> in <code>admin.js</code> + the <code>CHECK</code> in the database</td></tr>
+      <tr><td>Login email domain</td><td><code>usth.edu.vn</code></td><td><code>EMAIL_DOMAIN</code> in <code>.env</code></td></tr>
+      <tr><td>Who may register</td><td>students only (email must end with the student code)</td><td><code>checkStudentEmail()</code> in <code>auth.js</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================ PHASE 8 ============================ -->
+<section class="phase" id="p8">
+  <div class="phase-head"><span class="phase-no">Phase 9</span><h2>Troubleshooting</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Error</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>ECONNREFUSED 127.0.0.1:3306</code></td><td>MySQL isn't running. Start the <b>MySQL80</b> service</td></tr>
+      <tr><td><code>Access denied for user 'root'@'localhost'</code></td><td>Wrong <code>DB_PASSWORD</code>, or <code>.env</code> not saved yet (the tab shows a dot). Use your Workbench password and press <kbd>Ctrl</kbd>+<kbd>S</kbd>; the server restarts by itself. XAMPP: leave <code>DB_PASSWORD=</code> empty</td></tr>
+      <tr><td><code>Unknown database 'FacilityBookingDB'</code></td><td>Run <code>01_create_database.sql</code></td></tr>
+      <tr><td><code>Cannot find module ...</code></td><td>Run <code>npm install</code> inside <code>backend</code></td></tr>
+      <tr><td><code>EADDRINUSE :::3000</code></td><td>Stop the old server, or set <code>PORT=3001</code></td></tr>
+      <tr><td>“The start time must be in the future”</td><td>Pick a future date (or change <code>@day</code> in api-tests.http)</td></tr>
+      <tr><td>“Choose one time slot, for example 07:01-07:30.”</td><td>A booking must be exactly one slot. <code>10:00-12:00</code> is not a slot</td></tr>
+      <tr><td>“Use your university email…”</td><td>Log in with <code>name + code @usth.edu.vn</code>, e.g. <code>anhnq2410071@usth.edu.vn</code></td></tr>
+      <tr><td>“This room can only be booked by: TEACHER.”</td><td>That room has its own rule. Change it on the admin <span class="ui">Rooms</span> page</td></tr>
+      <tr><td>The website still shows an old page after you edit a file</td><td>Press <kbd>Ctrl</kbd>+<kbd>F5</kbd></td></tr>
+      <tr><td>A page keeps sending you back to login</td><td>Your token expired (8 hours). Log in again</td></tr>
+      <tr><td>Vietnamese names look broken</td><td>Run 01 and 02 again as written (they use utf8mb4)</td></tr>
+      <tr><td>Workbench error 1175 (safe update mode)</td><td>Run <code>SET SQL_SAFE_UPDATES = 0;</code> before the DELETE</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</main>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pre = btn.closest('.code').querySelector('pre');
+    var text = pre.innerText;
+    var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); };
+    var fallback = function () {
+      try {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = 'Press Ctrl+C';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 2500);
+      } catch (e) {}
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  });
+});
+</script>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Facility · Campus Facility Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="nav" class="nav"></header>
+
+  <main class="band">
+    <div class="container">
+      <p><a href="rooms.html" style="color:#053c3f">← Back to facilities</a></p>
+
+      <div id="message" class="message" hidden></div>
+      <div id="bookingMessage" class="message" hidden></div>
+
+      <div class="detail-grid">
+        <!-- left: the room -->
+        <section>
+          <div id="photo"></div>
+
+          <h1 style="font-size:22px;margin-top:14px" id="roomName">…</h1>
+          <div class="detail-chips" id="roomChips"></div>
+
+          <div class="tabs">
+            <button class="tab active" type="button" data-tab="description">Description</button>
+            <button class="tab" type="button" data-tab="equipment">Equipment</button>
+            <button class="tab" type="button" data-tab="rules">Rules</button>
+          </div>
+
+          <div class="detail-text" id="tabDescription"></div>
+          <div class="detail-text" id="tabEquipment" hidden></div>
+          <div class="detail-text" id="tabRules" hidden>
+            <ul>
+              <li>One booking is exactly one 30-minute slot (07:01–07:30, 07:31–08:00, … 20:31–21:00).</li>
+              <li>You can book up to 30 days ahead, and the purpose of the booking is required.</li>
+              <li>Every request starts as PENDING and must be approved by the administrator.</li>
+              <li>A teacher may take a slot booked by a student if it starts more than 24 hours from now.</li>
+              <li>You can cancel your own booking any time before it starts.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- right: the booking form -->
+        <aside class="card card-pad">
+          <h2>Book This Facility</h2>
+
+          <form id="bookingForm" style="margin-top:12px">
+            <div class="field">
+              <label for="date">Select Date</label>
+              <input id="date" type="date" required>
+            </div>
+
+            <div class="field">
+              <label for="slot">Time slot (30 minutes each)</label>
+              <select id="slot" required></select>
+            </div>
+
+            <label class="form-label">Availability Timeline</label>
+            <div class="timeline" id="timeline"></div>
+            <div class="tl-scale"><span>07:00</span><span>12:00</span><span>16:00</span><span>21:00</span></div>
+            <div class="legend">
+              <span><i class="dot free"></i>Available</span>
+              <span><i class="dot taken"></i>Occupied</span>
+              <span><i class="dot waiting"></i>Pending</span>
+              <span><i class="dot mine"></i>My selection</span>
+            </div>
+            <p class="hint" id="freeCount"></p>
+
+            <div class="field" style="margin-top:12px">
+              <label for="purpose">Purpose (required)</label>
+              <textarea id="purpose" required minlength="10"
+                        placeholder="e.g. Group study for the database exam"></textarea>
+            </div>
+
+            <div class="summary">
+              <div class="line"><span class="muted">Date:</span> <b id="sumDate">–</b></div>
+              <div class="line"><span class="muted">Time slot:</span> <b id="sumSlot">–</b></div>
+              <div class="line"><span class="muted">Total duration:</span> <b id="sumLength">30m</b></div>
+            </div>
+
+            <button class="btn btn-block" id="bookButton" type="submit" style="margin-top:14px">
+              Confirm Booking
+            </button>
+          </form>
+
+          <div class="note-card">
+            <span id="ruleIcon"></span>
+            <div>
+              <b>Booking Rules</b>
+              <p class="hint" style="margin:0">Requests are approved by the administrator. Cancel before the
+                slot starts if your plans change.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/room.js"></script>
+</body>
+</html>

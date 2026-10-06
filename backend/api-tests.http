@@ -1,0 +1,314 @@
+### University Facility Booking API - test requests
+### How to use: install the VS Code extension "REST Client", then click
+### "Send Request" above each block, from top to bottom.
+### Every sample account uses the password: Password@123
+###
+### IMPORTANT: change @day below to a date 2 to 30 days from today.
+### Times are 30-minute slots: 07:01-07:30, 07:31-08:00, ... , 20:31-21:00.
+
+@api = http://localhost:3000/api
+@day = 2026-09-25
+
+### Is the server running?
+GET {{api}}/health
+
+### ======================= REGISTER / LOGIN =======================
+### Students register themselves here. Teacher, staff and admin accounts are
+### created by the admin (see "Create an account" at the end of this file).
+
+### Register a student (name letters + student code)  -> 201
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{ "name": "Nguyễn Quỳnh Anh", "email": "anhnq2410099@usth.edu.vn", "password": "Secret123" }
+
+### A teacher email has no student code  -> 400
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{ "name": "Teacher", "email": "huydt@usth.edu.vn", "password": "Secret123" }
+
+### A Gmail address  -> 400
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{ "name": "Someone", "email": "someone@gmail.com", "password": "Secret123" }
+
+### Log in as a student
+# @name student
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "antt2410071@usth.edu.vn", "password": "Password@123" }
+
+### Log in as a teacher
+# @name teacher
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "huydt@usth.edu.vn", "password": "Password@123" }
+
+### Log in as the admin
+# @name admin
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "admin@usth.edu.vn", "password": "Password@123" }
+
+### An email outside the university  -> 400
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "someone@gmail.com", "password": "Password@123" }
+
+###
+@studentToken = {{student.response.body.token}}
+@teacherToken = {{teacher.response.body.token}}
+@adminToken = {{admin.response.body.token}}
+
+### Who am I?
+GET {{api}}/auth/me
+Authorization: Bearer {{studentToken}}
+
+### ======================= BROWSE ROOMS =======================
+
+### Room types and who may book them
+GET {{api}}/facilities/categories
+Authorization: Bearer {{studentToken}}
+
+### All rooms (can_book = 1 means I am allowed to book it)
+GET {{api}}/facilities
+Authorization: Bearer {{studentToken}}
+
+### Search and filter by type
+GET {{api}}/facilities?search=room&categoryId=1
+Authorization: Bearer {{studentToken}}
+
+### Room details (who_can_book = the rule for this room)
+GET {{api}}/facilities/1
+Authorization: Bearer {{studentToken}}
+
+### Filter by capacity and only open rooms
+GET {{api}}/facilities?minCapacity=20&onlyAvailable=true
+Authorization: Bearer {{studentToken}}
+
+### The 28 slots of a day: Free / Waiting for approval / Booked / Closed
+### Each slot also has canTakeOver = true when MY role may take it (teacher over student)
+GET {{api}}/facilities/1/availability?date={{day}}
+Authorization: Bearer {{studentToken}}
+
+### ======================= BOOKINGS =======================
+
+### 1. Book Study Room A101, slot 10:01-10:30  -> 201
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "facilityId": 1,
+  "bookingDate": "{{day}}",
+  "startTime": "10:01",
+  "endTime": "10:30",
+  "purpose": "Group study for the database exam"
+}
+
+### 2. The same slot again  -> 409 with the taken time
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 1, "bookingDate": "{{day}}", "startTime": "10:01", "endTime": "10:30",
+  "purpose": "This request should be refused" }
+
+### 3. The next slot 10:31-11:00  -> 201
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 1, "bookingDate": "{{day}}", "startTime": "10:31", "endTime": "11:00",
+  "purpose": "Project work for the web course" }
+
+### 4. A time that is not a slot (10:00-12:00)  -> 400
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 1, "bookingDate": "{{day}}", "startTime": "10:00", "endTime": "12:00",
+  "purpose": "This request should be refused" }
+
+### 5. No purpose  -> 400
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 2, "bookingDate": "{{day}}", "startTime": "09:01", "endTime": "09:30", "purpose": "" }
+
+### 6. Student books the Teacher Meeting Room (room type rule)  -> 403
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 4, "bookingDate": "{{day}}", "startTime": "09:01", "endTime": "09:30",
+  "purpose": "Club meeting for the students" }
+
+### 7. Student books Chemistry Lab D101 (this ROOM is teachers only)  -> 403
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 5, "bookingDate": "{{day}}", "startTime": "09:01", "endTime": "09:30",
+  "purpose": "Chemistry practice for the exam" }
+
+### 8. Room is unavailable (Badminton Hall)  -> 409
+POST {{api}}/bookings
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "facilityId": 7, "bookingDate": "{{day}}", "startTime": "09:01", "endTime": "09:30",
+  "purpose": "Badminton club practice" }
+
+### 9. Teacher takes slot 10:01-10:30 from the student  -> 201, "replacedBookings": 1
+POST {{api}}/bookings
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{ "facilityId": 1, "bookingDate": "{{day}}", "startTime": "10:01", "endTime": "10:30",
+  "purpose": "Tutorial session for class DB01" }
+
+### Numbers and lists for my dashboard
+GET {{api}}/bookings/summary
+Authorization: Bearer {{studentToken}}
+
+### My bookings (booking 1 is now CANCELLED with a note)
+GET {{api}}/bookings/my
+Authorization: Bearer {{studentToken}}
+
+### Only my pending bookings
+GET {{api}}/bookings/my?status=PENDING
+Authorization: Bearer {{studentToken}}
+
+### Cancel my booking (use an id from "My bookings")
+PATCH {{api}}/bookings/2/cancel
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "reason": "Our group changed the day" }
+
+### Change my password
+PUT {{api}}/auth/password
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{ "currentPassword": "Password@123", "newPassword": "Password@456" }
+
+### ======================= ADMIN =======================
+
+### Numbers and lists for the admin dashboard
+GET {{api}}/admin/summary
+Authorization: Bearer {{adminToken}}
+
+### Requests waiting for review
+GET {{api}}/admin/bookings?status=PENDING
+Authorization: Bearer {{adminToken}}
+
+### Booking history of all users
+GET {{api}}/admin/bookings
+Authorization: Bearer {{adminToken}}
+
+### Approve booking 3
+PATCH {{api}}/admin/bookings/3
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "status": "APPROVED" }
+
+### Reject (a note is required). Booking 3 is already approved, so this returns 409.
+PATCH {{api}}/admin/bookings/3
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "status": "REJECTED", "note": "The room is used for an exam" }
+
+### Add a room that only teachers may book
+POST {{api}}/admin/facilities
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "categoryId": 1, "name": "Study Room A103", "location": "Building A, Floor 1",
+  "capacity": 10, "description": "New study room", "equipment": "Whiteboard",
+  "imageUrl": "https://picsum.photos/seed/study-a103/640/400",
+  "allowedRoles": ["TEACHER"] }
+
+### Capacity must be 1..300  -> 400
+POST {{api}}/admin/facilities
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "categoryId": 1, "name": "Too big room", "capacity": 400 }
+
+### Capacity cannot be negative  -> 400
+POST {{api}}/admin/facilities
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "categoryId": 1, "name": "Negative room", "capacity": -5 }
+
+### Edit a room ("allowedRoles": [] means: follow the room type again)
+PUT {{api}}/admin/facilities/8
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "categoryId": 1, "name": "Study Room A103", "location": "Building A, Floor 1",
+  "capacity": 12, "description": "Renovated", "equipment": "Whiteboard, TV",
+  "imageUrl": "", "allowedRoles": [] }
+
+### Close a room (its future bookings become CANCELLED)
+PATCH {{api}}/admin/facilities/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "status": "UNAVAILABLE" }
+
+### Open it again
+PATCH {{api}}/admin/facilities/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "status": "AVAILABLE" }
+
+### Delete (hide) a room
+DELETE {{api}}/admin/facilities/8
+Authorization: Bearer {{adminToken}}
+
+### Create an account (any role - students can also register themselves)
+POST {{api}}/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "name": "Nguyễn Văn Hoàng", "email": "hoangnv2410073@usth.edu.vn",
+  "password": "Secret123", "role": "STUDENT" }
+
+### An email outside the university  -> 400
+POST {{api}}/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "name": "Outside user", "email": "someone@gmail.com", "password": "Secret123", "role": "STUDENT" }
+
+### Users
+GET {{api}}/admin/users?search=2410
+Authorization: Bearer {{adminToken}}
+
+### Lock a user
+PATCH {{api}}/admin/users/5
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "isActive": false }
+
+### Unlock the user and change the role
+PATCH {{api}}/admin/users/5
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "isActive": true, "role": "STAFF" }

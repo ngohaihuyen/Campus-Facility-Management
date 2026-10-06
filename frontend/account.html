@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg">
+  <title>Account · Campus Facility Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="nav" class="nav"></header>
+
+  <main class="band">
+    <div class="container">
+      <h1 class="page-title">My Account</h1>
+      <p class="page-sub">Your profile and password.</p>
+
+      <div class="two-col">
+        <section class="card card-pad">
+          <h2>Profile</h2>
+          <div class="summary" style="border-top:0;margin-top:8px;padding-top:0">
+            <div class="line"><span class="muted">Name</span> <b id="name"></b></div>
+            <div class="line"><span class="muted">Email</span> <b id="email"></b></div>
+            <div class="line"><span class="muted">Role</span> <b id="role"></b></div>
+          </div>
+        </section>
+
+        <section class="card card-pad">
+          <h2>Change password</h2>
+          <div id="message" class="message" hidden style="margin-top:12px"></div>
+          <form id="passwordForm" style="margin-top:12px">
+            <div class="field">
+              <label for="currentPassword">Current password</label>
+              <input id="currentPassword" type="password" required autocomplete="current-password">
+            </div>
+            <div class="field">
+              <label for="newPassword">New password (at least 8 characters)</label>
+              <input id="newPassword" type="password" minlength="8" required autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label for="confirmPassword">Repeat new password</label>
+              <input id="confirmPassword" type="password" minlength="8" required autocomplete="new-password">
+            </div>
+            <button class="btn" type="submit">Change password</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script>const ACCOUNT_ROLES = ['STUDENT', 'TEACHER', 'STAFF'];</script>
+  <script src="js/account.js"></script>
+</body>
+</html>
